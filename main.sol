@@ -14,7 +14,7 @@ contract HomeSeller is ERC721, ERC721URIStorage, Ownable {
     constructor() ERC721("HomeSeller", "HSL") {}
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://ipfs.io/ipfs/QmR8e38XbTEJA2aEgsKYwMQJtEPDnavZSuxHeuiZ37A2WZ";
+        return "ipfs://QmNfzQQMirgdLaanLV7XkwAr7SXzC8V13kqsYeyDon8Lsu";
     }
 
     function safeMint(address to, string memory uri) public onlyOwner {
@@ -30,12 +30,9 @@ contract HomeSeller is ERC721, ERC721URIStorage, Ownable {
         super._burn(tokenId);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory)
     {
         return super.tokenURI(tokenId);
     }
+
 }
