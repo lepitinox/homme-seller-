@@ -23,6 +23,10 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable {
     mapping(uint256 => HouseHistory) public houseHistories;
     mapping(uint256 => HouseSale) public houseSales;
 
+    event HouseMinted(uint256 tokenId, address owner);
+    event HouseSaleUpdated(uint256 tokenId, bool isForSale, uint256 price);
+    event HouseSold(uint256 tokenId, address seller, address buyer, uint256 price);
+
     constructor() ERC721("HouseHistoryNFT", "HHNFT") {}
     
     function safeMint(
@@ -40,16 +44,19 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable {
               previousOwners: new address[](0)
     });
     houseHistories[tokenId] = newHouseHistory;
+    emit HouseMinted(tokenId, to);
     }
 
     function putHouseForSale(uint256 tokenId, uint256 price) public {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Caller is not owner nor approved");
         houseSales[tokenId] = HouseSale({isForSale: true, price: price});
+        emit HouseSaleUpdated(tokenId, true, price);
     }
 
     function cancelHouseSale(uint256 tokenId) public {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Caller is not owner nor approved");
         houseSales[tokenId].isForSale = false;
+        emit HouseSaleUpdated(tokenId, false, 0);
     }
 
     function buyHouse(uint256 tokenId) public payable {
@@ -63,6 +70,8 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable {
         houseSales[tokenId].isForSale = false;
 
         payable(seller).transfer(houseSale.price);
+
+        emit HouseSold(tokenId, seller, msg.sender, houseSale.price);
     }
     function getHousesForSale() public view returns (uint256[] memory) {
         uint256 totalHouses = _tokenIdCounter.current();
